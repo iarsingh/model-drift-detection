@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-drift-detection
+  labels:
+    app: model-drift-detection
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: model-drift-detection
+  template:
+    metadata:
+      labels:
+        app: model-drift-detection
+    spec:
+      containers:
+        - name: api
+          image: model-drift-detection:local
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /v1/readyz
+              port: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-drift-detection
+spec:
+  selector:
+    app: model-drift-detection
+  ports:
+    - port: 80
+      targetPort: 8080
